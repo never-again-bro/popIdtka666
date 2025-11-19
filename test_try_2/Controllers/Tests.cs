@@ -1,27 +1,60 @@
-﻿//using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using TestingPlatform.Application.Dtos;
+using TestingPlatform.Application.Interfaces;
+using TestingPlatform.Requests.Student;
+using TestingPlatform.Requests.Test;
+using TestingPlatform.Responses.Test;
 
-//namespace test_try_2.Controllers;
+[ApiController]
+[Route("api/[controller]")]
+public class TestsController(ITestRepository testRepository, IMapper mapper) : ControllerBase
+{
+    [HttpGet]
+    public async Task<IActionResult> GetTests([FromQuery] bool? isPublic, [FromQuery] List<int> groupIds, [FromQuery] List<int> studentIds)
+    {
+        var tests = await testRepository.GetAllAsync(isPublic, groupIds, studentIds); 
 
-//[ApiController]
-//[Route("api/[controller]")]
-//public class TestsController : ControllerBase
-//{
-//    [HttpGet]
-//    public IActionResult GetAllTests() => Ok("Список тестов");
+        return Ok(mapper.Map<IEnumerable<TestResponse>>(tests));
+    }
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetTestById(int id)
+    {
+        var test = await testRepository.GetByIdAsync(id);
 
-//    [HttpGet("{id}")]
-//    public IActionResult GetTestById(int id)
-//    {
-//        if (id == 1) return Ok("Тест 1");
-//        return NotFound();
-//    }
+        return Ok(mapper.Map<TestResponse>(test));
+    }
+    [HttpPost]
+    public async Task<IActionResult> CreateTest([FromBody] CreateTestRequest test)
+    {
+        var testDto = new TestDto()
+        {
+            Title = test.Title,
+            Description = test.Description,
+            IsRepeatable = test.IsRepeatable,
+            DurationMinutes = test.DurationMinutes,
+            PassingScore = test.PassingScore,
+            MaxAttempts = test.MaxAttempts,
+            Deadline = test.Deadline
+        };
 
-//    [HttpPost]
-//    public IActionResult CreateTest() => Created("/api/tests/1", "Создан тест с ID=1");
+        var testId = await testRepository.CreateAsync(testDto);
 
-//    [HttpPut("{id}")]
-//    public IActionResult UpdateTest(int id) => NoContent();
+        return StatusCode(StatusCodes.Status201Created, new { Id = testId });
+    }
+    [HttpPut]
+    public async Task<IActionResult> UpdateTest([FromBody] UpdateTestRequest test)
+    {
+        await testRepository.UpdateAsync(mapper.Map<TestDto>(test));
 
-//    [HttpDelete("{id}")]
-//    public IActionResult DeleteTest(int id) => NoContent();
-//}
+        return NoContent();
+    }
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteTest(int id)
+    {
+        await testRepository.DeleteAsync(id);
+
+        return NoContent();
+    }
+} 

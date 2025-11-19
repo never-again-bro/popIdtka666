@@ -1,27 +1,60 @@
-﻿//using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using practice.Requests.Question;
+using TestingPlatform.Application.Dtos;
+using TestingPlatform.Application.Interfaces;
+using TestingPlatform.Domain.Enums;
+using TestingPlatform.Requests.Question;
+using TestingPlatform.Responses.Question;
 
-//namespace test_try_2.Controllers;
+[ApiController]
+[Route("api/[controller]")]
+public class QuestionsController(IQuestionRepository questionRepository, IMapper mapper) : ControllerBase
+{
+    [HttpGet]
+    public async Task<IActionResult> GetQuestions()
+    {
+        var questions = await questionRepository.GetAllAsync();
 
-//[ApiController]
-//[Route("api/[controller]")]
-//public class QuestionsController : ControllerBase
-//{
-//    [HttpGet]
-//    public IActionResult GetAllQuestions() => Ok("Список вопросов");
+        return Ok(mapper.Map<IEnumerable<QuestionResponse>>(questions));
+    }
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetQuestionById(int id)
+    {
+        var question = await questionRepository.GetByIdAsync(id);
 
-//    [HttpGet("{id}")]
-//    public IActionResult GetQuestionById(int id)
-//    {
-//        if (id == 1) return Ok("Вопрос 1");
-//        return NotFound();
-//    }
+        return Ok(mapper.Map<QuestionResponse>(question));
+    }
+    [HttpPost]
+    public async Task<IActionResult> CreateQuestion([FromBody] CreateQuestionRequest question)
+    {
+        var questionDto = new QuestionDto()
+        {
+            Text = question.Text,
+            Number = question.Number,
+            Description = question.Description,
+            AnswerType = question.AnswerType,
+            IsScoring = question.IsScoring,
+            MaxScore = question.MaxScore,
+            TestId = question.TestId
+        };
 
-//    [HttpPost]
-//    public IActionResult CreateQuestion() => Created("/api/tests/1", "Создан вопрос с ID=1");
+        var questionId = await questionRepository.CreateAsync(questionDto);
 
-//    [HttpPut("{id}")]
-//    public IActionResult UpdateQuestion(int id) => NoContent();
+        return StatusCode(StatusCodes.Status201Created, new { Id = questionId });
+    }
+    [HttpPut]
+    public async Task<IActionResult> UpdateQuestion([FromBody] UpdateQuestionRequest question)
+    {
+        await questionRepository.UpdateAsync(mapper.Map<QuestionDto>(question));
 
-//    [HttpDelete("{id}")]
-//    public IActionResult DeleteQuestion(int id) => NoContent();
-//}
+        return NoContent();
+    }
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteQuestion(int id)
+    {
+        await questionRepository.DeleteAsync(id);
+
+        return NoContent();
+    }
+}

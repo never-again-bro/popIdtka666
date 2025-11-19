@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using homework.Models;
 
 namespace TestingPlatform.Domain.Models
 {

@@ -8,7 +8,7 @@ namespace TestingPlatform.Domain.Models
         [Required]
         public string TextAnswer { get; set; }
         [Required]
-        public string UserAttemptAnswerId { get; set; }
+        public int UserAttemptAnswerId { get; set; }
         public UserAttemptAnswer UserAttemptAnswer { get; set; }
     }
 }

@@ -1,5 +1,4 @@
-﻿using homework.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using TestingPlatform.Domain.Enums;
 
 namespace TestingPlatform.Domain.Models
@@ -20,6 +19,6 @@ namespace TestingPlatform.Domain.Models
         public int TestId { get; set; }
         public Test Test { get; set; }
         public List<UserAttemptAnswer> UserAttemptAnswers { get; set; }
-        public List<Answer> Answers get; set; }
+        public List<Answer> Answers { get; set; }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 namespace TestingPlatform.Domain.Models;
-using homework.Models;
 
 public class Group
 {

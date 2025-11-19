@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using TestingPlatform.Domain.Enums;
-using TestingPlatform.Domain.Models;
 
-namespace homework.Models;
+namespace TestingPlatform.Domain.Models;
 public class Test
 {
     public int Id { get; set; }
@@ -13,11 +12,11 @@ public class Test
     public bool IsRepeatable { get; set; } = false;
     public TestType Type { get; set; }
     public AnswerType AnswerType { get; set; }
-    public DateTimeOffset CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
     [Required]
-    public DateTimeOffset PublishedAt { get; set; }
+    public DateTime PublishedAt { get; set; }
     [Required]
-    public DateTimeOffset Deadline { get; set; }
+    public DateTime Deadline { get; set; }
     public int? DurationMinutes { get; set; }
     public bool IsPublic { get; set; } = false;
     public int? PassingScore { get; set; }

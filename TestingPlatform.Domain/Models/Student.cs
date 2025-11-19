@@ -1,5 +1,4 @@
-﻿using homework.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 namespace TestingPlatform.Domain.Models
 {
     public class Student

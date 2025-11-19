@@ -1,7 +1,5 @@
-﻿using homework.Models;
+﻿using TestingPlatform.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using TestingPlatform.Domain.Enums;
-using TestingPlatform.Domain.Models;
 
 namespace TestingPlatform.Infrastructure;
 
