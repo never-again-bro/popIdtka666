@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Formatting.Json;
 using TestingPlatform.Application.Interfaces;
 using TestingPlatform.Infrastructure;
 using TestingPlatform.Infrastructure.Repositories;
@@ -14,16 +16,28 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IGroupRepository, GroupRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps("TestingPlatform.Infrastructure"));
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps("TestingPlatform"));
 
+builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<ITestRepository, TestRepository>();
 builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
+builder.Services.AddScoped<IAttemptRepository, AttemptRepository>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+
+Log.Logger = new LoggerConfiguration()
+   .MinimumLevel.Information()
+   .WriteTo.Console()
+   .WriteTo.File(
+       formatter: new JsonFormatter(),
+       path: "logs/structured-.json")
+   .WriteTo.SQLite("logs/logs.db")
+   .CreateLogger();
+
+builder.Host.UseSerilog();
 
 var app = builder.Build();
 

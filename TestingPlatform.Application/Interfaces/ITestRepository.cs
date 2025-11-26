@@ -10,6 +10,7 @@ public interface ITestRepository
     Task<IEnumerable<object>> GetDirectionAveragesAsync();
     Task<IEnumerable<object>> GetTestCountByTypeAsync();
     Task<IEnumerable<TestDto>> GetTopRecentAsync(int count);
+    Task<IEnumerable<TestDto>> GetAllForStudent(int studentId);
     Task<IEnumerable<TestDto>> GetAllAsync(bool? isPublic, List<int> groupIds, List<int> studentIds);
     Task<TestDto> GetByIdAsync(int id);
     Task<int> CreateAsync(TestDto testDto);

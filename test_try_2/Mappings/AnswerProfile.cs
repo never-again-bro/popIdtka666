@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
 using TestingPlatform.Application.Dtos;
 using TestingPlatform.Requests.Answer;
-using TestingPlatform.Requests.Student;
-using TestingPlatform.Responses.Course;
-using TestingPlatform.Responses.Test;
 
 namespace TestingPlatform.Mappings;
 

@@ -4,6 +4,7 @@ using TestingPlatform.Application.Dtos;
 using TestingPlatform.Application.Interfaces;
 using TestingPlatform.Domain.Models;
 using TestingPlatform.Infrastructure.Exceptions;
+using BCrypt;
 
 namespace TestingPlatform.Infrastructure.Repositories;
 
@@ -36,7 +37,7 @@ public class UserRepository(AppDbContext appDbContext, IMapper mapper) : IUserRe
         user.FirstName = userDto.FirstName;
         user.LastName = userDto.LastName;
         user.MiddleName = userDto.MiddleName;
-        user.PasswordHash = userDto.Password;
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
 
         await appDbContext.AddAsync(user);
         await appDbContext.SaveChangesAsync();
