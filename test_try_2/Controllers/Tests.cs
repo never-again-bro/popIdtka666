@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TestingPlatform.Application.Dtos;
@@ -11,8 +12,20 @@ using TestingPlatform.Responses.Test;
 [Route("api/[controller]")]
 public class TestsController(ITestRepository testRepository, IMapper mapper) : ControllerBase
 {
+    [HttpGet("manage")]
+    [Authorize(Roles = "Manager")]
+    [ProducesResponseType(typeof(IEnumerable<TestResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetTestsForManager([FromQuery] bool? isPublic, [FromQuery] List<int> groupIds, [FromQuery] List<int> studentIds)
+    {
+        var userId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var tests = await testRepository.GetAllAsync(isPublic, groupIds, studentIds);
+
+        return Ok(mapper.Map<IEnumerable<TestResponse>>(tests));
+    }
+
     [HttpGet]
-    public async Task<IActionResult> GetTests([FromQuery] bool? isPublic, [FromQuery] List<int> groupIds, [FromQuery] List<int> studentIds)
+    [Authorize(Roles = "Student")]
+    public async Task<IActionResult> GetTestsForStudent([FromQuery] bool? isPublic, [FromQuery] List<int> groupIds, [FromQuery] List<int> studentIds)
     {
         var tests = await testRepository.GetAllAsync(isPublic, groupIds, studentIds); 
 
@@ -58,3 +71,6 @@ public class TestsController(ITestRepository testRepository, IMapper mapper) : C
         return NoContent();
     }
 } 
+
+
+
