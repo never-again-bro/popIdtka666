@@ -19,10 +19,20 @@ public class AppDbContext : DbContext
     public DbSet<UserSelectedOption> UserSelectedOption => Set<UserSelectedOption>();
     public DbSet<UserTextAnswer> UserTextAnswer => Set<UserTextAnswer>();
     public DbSet<TestResult> TestResult => Set<TestResult>();
+
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<RefreshToken>()
+            .HasIndex(rt => rt.TokenHash);
+
+        modelBuilder.Entity<RefreshToken>()
+           .HasOne(rt => rt.User)
+           .WithMany(u => u.RefreshTokens)
+           .HasForeignKey(rt => rt.UserId);
+
         modelBuilder.Entity<User>(e =>
         {
             e.HasKey(x => x.Id);
@@ -211,5 +221,6 @@ public class AppDbContext : DbContext
                 .HasForeignKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
         });
+
     }
 }

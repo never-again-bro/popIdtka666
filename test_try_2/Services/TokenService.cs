@@ -4,6 +4,7 @@ using TestingPlatform.Responses.Auth;
 using TestingPlatform.Settings;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace TestingPlatform.Services;
@@ -41,5 +42,13 @@ public class TokenService : ITokenService
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public string CreateRefreshToken()
+    {
+        var random = new byte[32];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(random);
+        return Convert.ToBase64String(random);
     }
 }

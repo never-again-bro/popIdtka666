@@ -65,6 +65,7 @@ builder.Services.AddScoped<IAttemptRepository, AttemptRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 var key = Encoding.UTF8.GetBytes(jwtSettings.Key);
