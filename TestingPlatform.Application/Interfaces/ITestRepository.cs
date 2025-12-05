@@ -5,6 +5,7 @@ namespace TestingPlatform.Application.Interfaces;
 
 public interface ITestRepository
 {
+    Task<IEnumerable<object>> GetAllForStudentById(int studentId, int testId);
     Task<IEnumerable<object>> GetTopGroupsByTestCountAsync(int top = 10);
     Task<IEnumerable<object>> GetTestTimelineByPublicAsync();
     Task<IEnumerable<object>> GetDirectionAveragesAsync();

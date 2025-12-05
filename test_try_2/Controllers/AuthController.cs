@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using TestingPlatform.Requests.Auth;
 using TestingPlatform.Responses.Auth;
+using TestingPlatform.Responses.Student;
 using TestingPlatform.Services;
 using TestingPlatform.Settings;
 using TestingPlatform.Application.Dtos;
@@ -14,7 +15,7 @@ namespace TestingPlatform.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-public class AuthController(IAuthRepository authRepository, ITokenService tokenService, IRefreshTokenRepository refreshTokenRepository, IMapper mapper, IOptions<JwtSettings> options) : ControllerBase
+public class AuthController(IAuthRepository authRepository, ITokenService tokenService, IStudentRepository studentRepository, IRefreshTokenRepository refreshTokenRepository, IMapper mapper, IOptions<JwtSettings> options) : ControllerBase
 {
     private async Task GenerateAndSetRefreshTokenAsync(int userId)
     {
@@ -37,6 +38,10 @@ public class AuthController(IAuthRepository authRepository, ITokenService tokenS
         var userLoginDto = mapper.Map<UserLoginDto>(auth);
         var user = await authRepository.AuthorizeUser(userLoginDto);
         var response = mapper.Map<AuthResponse>(user);
+        var student = await studentRepository.GetStudentByUserId(user.Id);
+
+        if (student != null)
+            response.Student = mapper.Map<StudentResponse>(student);
 
         await GenerateAndSetRefreshTokenAsync(user.Id);
 

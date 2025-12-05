@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using TestingPlatform.Constants;
 
 namespace TestingPlatform.Services;
 
@@ -21,28 +22,32 @@ public class TokenService : ITokenService
     }
 
     public string CreateAccessToken(AuthResponse authResponse)
-    {
-        var claims = new List<Claim>
+{
+       var claims = new List<Claim>
        {
            new Claim(ClaimTypes.NameIdentifier, authResponse.Id.ToString()),
            new Claim(ClaimTypes.Name, authResponse.Login),
            new Claim(ClaimTypes.Email, authResponse.Email ?? string.Empty),
-           new Claim(ClaimTypes.Role, authResponse.Role.ToString())
+           new Claim(ClaimTypes.Role, authResponse.Role.ToString()),
        };
 
-        var credentials = new SigningCredentials(new SymmetricSecurityKey(_key), SecurityAlgorithms.HmacSha256);
-        var expires = DateTime.UtcNow.AddMinutes(_settings.AccessTokenMinutes);
+       //TODO: практика, добавили в клайм StudentId
+       if(authResponse.Student != null)
+           claims.Add(new Claim(TestingPlatformClaimTypes.StudentId, authResponse.Student.Id.ToString()));
+  
+       var credentials = new SigningCredentials(new SymmetricSecurityKey(_key), SecurityAlgorithms.HmacSha256);
+       var expires = DateTime.UtcNow.AddMinutes(_settings.AccessTokenMinutes);
 
-        var token = new JwtSecurityToken(
-            issuer: _settings.Issuer,
-            audience: _settings.Audience,
-            claims: claims,
-            expires: expires,
-            signingCredentials: credentials
-        );
+       var token = new JwtSecurityToken(
+           issuer: _settings.Issuer,
+           audience: _settings.Audience,
+           claims: claims,
+           expires: expires,
+           signingCredentials: credentials
+       );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
+   return new JwtSecurityTokenHandler().WriteToken(token);
+}
 
     public string CreateRefreshToken()
     {

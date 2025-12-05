@@ -9,6 +9,29 @@ namespace TestingPlatform.Infrastructure.Repositories;
 
 public class TestRepository(AppDbContext appDbContext, IMapper mapper) : ITestRepository
 {
+    public async Task<IEnumerable<object>> GetAllForStudentById(int studentId, int testId)
+    {
+        await RefreshPublicationStatusesAsync();
+        var test = await appDbContext.Test
+            .Where(t => t.IsPublic)
+            .Where(t => t.Students.Any(s => s.Id == studentId))
+            .Include(test => test.Directions)
+            .Include(test => test.Courses)
+            .Include(test => test.Groups)
+            .Include(test => test.Projects)
+            .Include(test => test.Students)
+                .ThenInclude(student => student.User)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(test => test.Id == testId);
+
+        if (test == null)
+        {
+            throw new EntityNotFoundException("Тест не найден.");
+        }
+
+        return mapper.Map<IEnumerable<TestDto>>(test);
+    }
+
     public async Task<IEnumerable<object>> GetTopGroupsByTestCountAsync(int top = 10)
     {
         return await appDbContext.Test

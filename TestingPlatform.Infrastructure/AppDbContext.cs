@@ -1,5 +1,6 @@
 ﻿using TestingPlatform.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using TestingPlatform.Domain.Enums;
 
 namespace TestingPlatform.Infrastructure;
 
@@ -25,6 +26,21 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<User>().HasData(
+        new User
+        {
+            Id = 100,
+            FirstName = "Иван",
+            MiddleName = "Иванович",
+            LastName = "Иванов",
+            Login = "manager",
+            Email = "manager@local",
+            PasswordHash = "$2a$11$pThhbbceEToQ9dK9L/7yo.hZ/hi6Kg4mlXa5Z0X8T3OF61O0wHGUW", // manager
+            Role = UserRole.Manager,
+            CreatedAt = DateTime.UtcNow
+        }
+    );
+
         modelBuilder.Entity<RefreshToken>()
             .HasIndex(rt => rt.TokenHash);
 

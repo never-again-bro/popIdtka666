@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TestingPlatform.Application.Dtos;
 using TestingPlatform.Application.Interfaces;
+using TestingPlatform.Extensions;
 using TestingPlatform.Requests.Student;
 using TestingPlatform.Requests.Test;
 using TestingPlatform.Responses.Test;
@@ -12,6 +13,18 @@ using TestingPlatform.Responses.Test;
 [Route("api/[controller]")]
 public class TestsController(ITestRepository testRepository, IMapper mapper) : ControllerBase
 {
+    [HttpGet("available")]
+    [ProducesResponseType(typeof(IEnumerable<TestResponse>), StatusCodes.Status200OK)]
+    [Authorize(Roles = "Student")]
+    public async Task<IActionResult> GetTestsForStudentById(int testId)
+    {
+        var studentId = HttpContext.TryGetUserId();
+
+        var test = await testRepository.GetAllForStudentById(studentId, testId);
+
+        return Ok(mapper.Map<IEnumerable<TestResponse>>(test));
+    }
+
     [HttpGet("manage")]
     [Authorize(Roles = "Manager")]
     [ProducesResponseType(typeof(IEnumerable<TestResponse>), StatusCodes.Status200OK)]
@@ -23,14 +36,18 @@ public class TestsController(ITestRepository testRepository, IMapper mapper) : C
         return Ok(mapper.Map<IEnumerable<TestResponse>>(tests));
     }
 
-    [HttpGet]
+    [HttpGet("available")]
+    [ProducesResponseType(typeof(IEnumerable<TestResponse>), StatusCodes.Status200OK)]
     [Authorize(Roles = "Student")]
-    public async Task<IActionResult> GetTestsForStudent([FromQuery] bool? isPublic, [FromQuery] List<int> groupIds, [FromQuery] List<int> studentIds)
+    public async Task<IActionResult> GetTestsForStudent()
     {
-        var tests = await testRepository.GetAllAsync(isPublic, groupIds, studentIds); 
+        var studentId = HttpContext.TryGetUserId();
+
+        var tests = await testRepository.GetAllForStudent(studentId);
 
         return Ok(mapper.Map<IEnumerable<TestResponse>>(tests));
     }
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetTestById(int id)
     {

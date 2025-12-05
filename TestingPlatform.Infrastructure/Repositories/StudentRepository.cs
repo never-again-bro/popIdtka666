@@ -9,6 +9,22 @@ namespace TestingPlatform.Infrastructure.Repositories;
 
 public class StudentRepository(AppDbContext appDbContext, IMapper mapper) : IStudentRepository
 {
+    public async Task<StudentDto?> GetStudentByUserId(int userId)
+    {
+        var student = await appDbContext.Students
+            .Include(s => s.User)
+            .Include(s => s.Tests)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(student => student.UserId == userId);
+
+        if (student == null)
+        {
+            return null;
+        }
+
+        return mapper.Map<StudentDto>(student);
+    }
+
     public async Task<IEnumerable<StudentDto>> GetAllAsync()
     {
         var students = await appDbContext.Students
